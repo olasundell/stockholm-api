@@ -2,6 +2,8 @@ package se.atrosys.stockholm;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.atrosys.stockholm.converter.DetailedServiceUnitConverter;
 import se.atrosys.stockholm.converter.ServiceUnitConverter;
 import se.atrosys.stockholm.converter.SthlmListConverter;
@@ -25,10 +27,11 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class Api {
-
 	private final String HOST = "http://api.stockholm.se/";
 	private String apikey;
 	private String service;
+	private Proxy proxy;
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public Api() throws IOException {
 		service = "ServiceGuideService";
@@ -41,6 +44,15 @@ public class Api {
 				BufferedReader reader = new BufferedReader(new FileReader(apikey));
 				this.apikey = String.format("apikey=%s",reader.readLine());
 			}
+		}
+
+		URL proxyUrl = new URL("http://localhost:3128/");
+		try {
+			URLConnection conn = proxyUrl.openConnection();
+			conn.connect();
+			proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", 3128));
+		} catch (IOException e) {
+			logger.debug("No proxy found on port 3128");
 		}
 	}
 
@@ -61,7 +73,14 @@ public class Api {
 
 	private InputStreamReader createInputStreamReader(String spec) throws IOException {
 		URL url = new URL(spec);
-		URLConnection conn = url.openConnection(new Proxy(Proxy.Type.HTTP,  new InetSocketAddress("localhost", 3128)));
+		URLConnection conn;
+
+		if (proxy != null) {
+			conn = url.openConnection(proxy);
+		} else {
+			conn = url.openConnection();
+		}
+
 		conn.connect();
 
 		return new InputStreamReader(conn.getInputStream());
@@ -91,7 +110,8 @@ public class Api {
 
 	public DetailedServiceUnit getDetailedServiceUtil(ServiceUnit unit) throws IOException {
 		XStream xstream = new XStream(new DomDriver());
-		InputStreamReader reader = createInputStreamReader(createUrlSpec(service, "DetailedServiceUnits/"+unit.getId()));
+		String urlSpec = createUrlSpec(service, "DetailedServiceUnits/" + unit.getId());
+		InputStreamReader reader = createInputStreamReader(urlSpec);
 		xstream.alias("DetailedServiceUnit", DetailedServiceUnit.class);
 		xstream.registerConverter(new DetailedServiceUnitConverter());
 		return (DetailedServiceUnit) xstream.fromXML(reader);

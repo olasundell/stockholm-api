@@ -2,10 +2,7 @@ package se.atrosys.stockholm;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import se.atrosys.stockholm.model.Attribute;
-import se.atrosys.stockholm.model.DetailedServiceUnit;
-import se.atrosys.stockholm.model.ServiceUnit;
-import se.atrosys.stockholm.model.SthlmList;
+import se.atrosys.stockholm.model.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,10 +67,28 @@ public class ApiTest {
 		DetailedServiceUnit detailedServiceUnit = api.getDetailedServiceUtil(unit);
 		assertNotNull(detailedServiceUnit);
 
-		List<Attribute> attributes = detailedServiceUnit.getAttributes();
+		assertAttributeList(detailedServiceUnit.getAttributes());
 
+		List<GeographicalArea> geographicalAreas = detailedServiceUnit.getGeographicalAreas();
+
+		assertNotNull(geographicalAreas);
+//		assertNotEquals(geographicalAreas.size(), 0, "List is empty");
+	}
+
+	private void assertAttributeList(List<Attribute> attributes) {
 		assertNotNull(attributes);
-		// TODO add this assert again and continue working.
-//		assertNotEquals(attributes.size(), 0, "List is empty");
+		assertNotEquals(attributes.size(), 0, "List is empty");
+		assertTrue(attributes.size() > 5, "List is too small");
+
+		for (Attribute attribute: attributes) {
+			assertAttribute(attribute);
+		}
+	}
+
+	private void assertAttribute(Attribute attribute) {
+		assertNotNull(attribute);
+//		assertNotNull(attribute.getValue());
+		assertNotNull(attribute.getId());
+		assertFalse(attribute.getId().isEmpty());
 	}
 }

@@ -5,8 +5,11 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import se.atrosys.stockholm.factory.AttributeListFactory;
+import se.atrosys.stockholm.factory.GeographicalAreaListFactory;
 import se.atrosys.stockholm.factory.ServiceUnitFactory;
 import se.atrosys.stockholm.model.DetailedServiceUnit;
+import se.atrosys.stockholm.model.GeographicalArea;
 import se.atrosys.stockholm.model.GeographicalPosition;
 
 /**
@@ -30,7 +33,8 @@ public class DetailedServiceUnitConverter implements Converter {
 
 		reader.moveDown();
 
-		Object o = reader.getValue();
+		detailedServiceUnit.addAttributes(new AttributeListFactory().attributeListFactory(reader));
+		detailedServiceUnit.addGeographicalAreas(new GeographicalAreaListFactory().geographicalAreaListFactory(reader));
 
 		return detailedServiceUnit;
 	}

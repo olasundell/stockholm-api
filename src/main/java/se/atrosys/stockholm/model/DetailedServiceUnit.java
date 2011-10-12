@@ -1,6 +1,7 @@
 package se.atrosys.stockholm.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,5 +47,14 @@ public class DetailedServiceUnit {
 
 	public List<ServiceUnit> getRelatedServiceUnits() {
 		return relatedServiceUnits;
+	}
+
+	public void addAttributes(Collection<Attribute> collection) {
+		attributes.addAll(collection);
+	}
+
+
+	public void addGeographicalAreas(Collection<GeographicalArea> geographicalAreas) {
+		geographicalAreas.addAll(geographicalAreas);
 	}
 }
